@@ -94,47 +94,49 @@
 		</form>
 	</div>
 
+
+
 <script>
-// Create a TextEncoder for UTF-8 encoding
-var textEncoder = new TextEncoder("utf-8");
-
-// Function to sign data and log the signature
-function signAndLogData(hmacKey, data) {
-    // Sign the data using the HMAC key
-    window.crypto.subtle.sign(
-        "HMAC",            // HMAC algorithm
-        hmacKey,           // HMAC key
-        textEncoder.encode(data)  // Encode the data as bytes
-    ).then(signature => {
-        // Convert the signature bytes to a hexadecimal string
-        var signatureBytes = new Uint8Array(signature);
-        var JWT = Array.prototype.map.call(signatureBytes, x => x.toString(16).padStart(2, '0')).join("");
-        
-        // Log the data and its signature
-        console.log("Data:", data);
-        console.log("JWT:", JWT);
-        console.log("");
+    // Create a TextEncoder for UTF-8 encoding
+    var textEncoder = new TextEncoder("utf-8");
+    
+    // Function to sign data and log the signature
+    function signAndLogData(hmacKey, data) {
+        // Sign the data using the HMAC key
+        window.crypto.subtle.sign(
+            "HMAC",            // HMAC algorithm
+            hmacKey,           // HMAC key
+            textEncoder.encode(data)  // Encode the data as bytes
+        ).then(signature => {
+            // Convert the signature bytes to a hexadecimal string
+            var signatureBytes = new Uint8Array(signature);
+            var JWT = Array.prototype.map.call(signatureBytes, x => x.toString(16).padStart(2, '0')).join("");
+            
+            // Log the data and its signature
+            console.log("Data:", data);
+            console.log("JWT:", JWT);
+            console.log("");
+        });
+    }
+    
+    // Import an HMAC key
+    window.crypto.subtle.importKey(
+        "raw",                   // Key format is raw bytes
+        textEncoder.encode("Mustafa"),  // HMAC key data as bytes
+        {
+            name: "HMAC",        // HMAC algorithm
+            hash: {name: "SHA-512"} // SHA-512 hash function
+        },
+        false, // Key not extractable
+        ["sign", "verify"] // Key usages (signing and verifying)
+    ).then(importedKey => {
+        // Set up a timer to generate and sign new data every 2 seconds
+        setInterval(function() {
+            // Generate new data with a random number appended
+            var newData = 'Mustafa\'s Data ' + Math.random();
+            // Sign and log the new data
+            signAndLogData(importedKey, newData);
+        }, 2000); // 2 seconds in milliseconds
     });
-}
-
-// Import an HMAC key
-window.crypto.subtle.importKey(
-    "raw",                   // Key format is raw bytes
-    textEncoder.encode("Mustafa"),  // HMAC key data as bytes
-    {
-        name: "HMAC",        // HMAC algorithm
-        hash: {name: "SHA-512"} // SHA-512 hash function
-    },
-    false, // Key not extractable
-    ["sign", "verify"] // Key usages (signing and verifying)
-).then(importedKey => {
-    // Set up a timer to generate and sign new data every 2 seconds
-    setInterval(function() {
-        // Generate new data with a random number appended
-        var newData = 'Mustafa\'s Data ' + Math.random();
-        // Sign and log the new data
-        signAndLogData(importedKey, newData);
-    }, 2000); // 2 seconds in milliseconds
-});
-</script>
+    </script>
 {% endblock content %}
