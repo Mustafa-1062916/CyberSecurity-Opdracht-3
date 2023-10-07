@@ -1,5 +1,0 @@
-.idea
-*.pyc
-__pycache__
-identifier.sqlite
-# db.sqlite3
